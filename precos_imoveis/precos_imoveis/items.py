@@ -13,7 +13,6 @@ class PrecosImoveisItem(scrapy.Item):
     banheiro = scrapy.Field()
     vaga = scrapy.Field()
     preco = scrapy.Field()
-    condominio = scrapy.Field()
-    descricao = scrapy.Field()
+
 
     pass
