@@ -25,19 +25,24 @@ class ImovelSpider(scrapy.Spider):
             dados_endereco = endereco_sem_estado.split(',')
             cidade = dados_endereco[len(dados_endereco)-1]
             cidade = unidecode(cidade).upper().strip()
+            print(cidade)
             lista_cidades.append(cidade)
 
         items['metros_quadrados'] = response.css('.js-property-card-detail-area::text').getall()
         items['quarto'] = response.css('.js-property-detail-rooms .js-property-card-value::text').getall()
         items['banheiro'] = response.css('.js-property-detail-bathroom .js-property-card-value::text').getall()
         items['vaga'] = response.css('.js-property-detail-garages .js-property-card-value::text').getall()
-        items['preco'] = response.css('p::text').getall()
-        items['preco'] = items['preco']
+        items['preco'] = response.css('#js-site-main p::text').getall()
 
-        if len(items['preco']) > len(items['quarto']):
-            lista_precos = items['preco'][0:36]
-        else:
-            lista_precos = items['preco']
+        lista_preco = [line.strip() for line in  items['preco'] if line.strip() != ""]
+
+        print(items['preco'])
+        print(lista_preco)
+
+        # if len(items['preco']) > len(items['quarto']):
+        #     lista_precos = items['preco'][0:36]
+        # else:
+        #     lista_precos = items['preco']
 
         
 
@@ -49,12 +54,17 @@ class ImovelSpider(scrapy.Spider):
         df['vagas'] =  items['vaga']
         df['cidade'] =  lista_cidades
         df['estado'] =  lista_estados
-        df['preco'] =  lista_precos
+        # df['preco'] =  items['preco']
+        print(len(items['banheiro']))
+        print(len(df['cidade']))
+        print(len(lista_preco))
+        df['preco'] =  lista_preco[:36]
 
-        
         df['preco'] = df['preco'].apply(lambda x: int(x.replace('R$','').replace('.','').strip()) if 'R$' in x else 0.0)
         df = df[df['preco'] != 0.0]
         print(df)
+
+
 
 
         pass
