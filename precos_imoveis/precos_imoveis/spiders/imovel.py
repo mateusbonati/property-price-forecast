@@ -2,6 +2,14 @@ import scrapy
 import pandas as pd
 from precos_imoveis.items import PrecosImoveisItem
 from unidecode import unidecode
+import precos_imoveis.spiders.config as banco
+import pymysql
+from urllib.parse import quote
+import mysql.connector
+from sqlalchemy import create_engine
+
+
+
 
 class ImovelSpider(scrapy.Spider):
     name = 'imovel'
@@ -62,9 +70,12 @@ class ImovelSpider(scrapy.Spider):
 
         df['preco'] = df['preco'].apply(lambda x: int(x.replace('R$','').replace('.','').strip()) if 'R$' in x else 0.0)
         df = df[df['preco'] != 0.0]
+
         print(df)
-
-
+        print(banco.USER)
+        engine = create_engine("mysql+pymysql://" +banco.USER+ ":%s" % quote(banco.SENHA) +"@"+banco.HOST+":"+banco.PORT+"/"+banco.SCHEMA)
+        
+        df.to_sql(banco.TABELA, con = engine, if_exists='replace', index = False)
 
 
         pass
