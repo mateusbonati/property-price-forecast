@@ -1,3 +1,4 @@
+from email import header
 import scrapy
 import pandas as pd
 from precos_imoveis.items import PrecosImoveisItem
@@ -16,10 +17,12 @@ class ImovelSpider(scrapy.Spider):
 
     start_urls = ['https://www.vivareal.com.br/venda']
 
+    
     def parse(self, response):
         items = PrecosImoveisItem()
         items['endereco'] = response.css('.property-card__address::text').getall()
 
+        
 
         lista_cidades = []
         lista_estados = []
@@ -75,7 +78,19 @@ class ImovelSpider(scrapy.Spider):
         print(banco.USER)
         engine = create_engine("mysql+pymysql://" +banco.USER+ ":%s" % quote(banco.SENHA) +"@"+banco.HOST+":"+banco.PORT+"/"+banco.SCHEMA)
         
-        df.to_sql(banco.TABELA, con = engine, if_exists='replace', index = False)
+        df.to_sql(banco.TABELA, con = engine, if_exists='append', index = False)
 
+        
+        next_page = response.css('.pagination__item:nth-child(9) .js-change-page').getall()
+        list_next_page = next_page[0].split('data-page=')
+        number = list_next_page[1].split('>')[0]
+        number = number.replace('"','')
+        next_page = 'https://www.vivareal.com.br/venda/?pagina='+str(number)
+        print('https://www.vivareal.com.br/venda/?pagina='+str(number))
+        print('AQUI')
 
-        pass
+        
+
+        yield response.follow(next_page,  callback= self.parse)
+        
+
