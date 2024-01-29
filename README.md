@@ -30,8 +30,7 @@ To set up the project, clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/mateusbonati/property-price-forecast
-cd rpecos_imoveis
-pip install -r requirements.txt
+cd precos_imoveis
 ```
 
 ## Usage
